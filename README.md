@@ -16,20 +16,24 @@ install.sh  symlinks everything into place
 ## Install
 
 ```bash
-git clone <this-repo> ~/dotfiles
-cd ~/dotfiles
+git clone <this-repo> ~/personal/dotfiles
+cd ~/personal/dotfiles
 ./install.sh
 ```
 
 `install.sh` moves anything already at those paths into a timestamped
 `~/.dotfiles-backup-*` directory before linking, and is safe to re-run.
 
-To try the Neovim config without touching an existing one:
+To try the Neovim config without touching an existing one — no symlinks, no
+`install.sh`, nothing written outside the clone:
 
 ```bash
-git clone <this-repo> ~/dotfiles
-NVIM_APPNAME=dotfiles/nvim nvim
+git clone <this-repo> ~/personal/dotfiles
+XDG_CONFIG_HOME=~/personal/dotfiles nvim
 ```
+
+(`NVIM_APPNAME` won't work here — it resolves under `~/.config`, so it can't
+reach a clone living anywhere else.)
 
 ## Requirements
 
