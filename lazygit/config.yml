@@ -1,0 +1,9 @@
+os:
+  # Open files in the parent neovim (via the $NVIM socket that neovim sets
+  # inside its own :terminal) instead of spawning a nested nvim.
+  editPreset: "nvim-remote"
+  editInTerminal: false
+  # Hand the file to LazygitEdit() in the parent nvim, which closes the lazygit
+  # float and opens the file in the real editing window (see nvim/lua/plugins/git/lazygit.lua).
+  edit: 'nvim --server "$NVIM" --remote-expr "v:lua.LazygitEdit(''{{filename}}'', 0)" >/dev/null 2>&1'
+  editAtLine: 'nvim --server "$NVIM" --remote-expr "v:lua.LazygitEdit(''{{filename}}'', {{line}})" >/dev/null 2>&1'
