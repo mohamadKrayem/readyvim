@@ -1,4 +1,6 @@
-# dotfiles
+# ReadyVim
+
+> A dark, batteries-included Neovim + tmux config. nvim, tmux, lazygit & yazi wired to work as one.
 
 Configuration for the four tools I actually live in: Neovim, tmux, yazi and lazygit.
 They're wired together — the same `Ctrl+h/j/k/l` crosses nvim splits and tmux panes,
@@ -34,6 +36,19 @@ XDG_CONFIG_HOME=~/personal/dotfiles nvim
 
 (`NVIM_APPNAME` won't work here — it resolves under `~/.config`, so it can't
 reach a clone living anywhere else.)
+
+## Try it in Docker
+
+Test the whole setup in a throwaway container — no symlinks, nothing installed
+on your machine:
+
+```bash
+make docker-test
+```
+
+This builds a Linux image with all the tools, runs `install.sh`, pre-installs
+the Neovim plugins, and drops you into a themed tmux session. See
+[docker/README.md](docker/README.md) for details and a live-mount dev workflow.
 
 ## Requirements
 
