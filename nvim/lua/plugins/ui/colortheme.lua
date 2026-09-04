@@ -4,7 +4,7 @@
 -- permanently. <leader>ut opens a picker to try the others for the current
 -- session (not remembered across restarts, by design — predictable startup).
 
-local DEFAULT = "github_dark_dimmed"
+local DEFAULT = "no-clown-fiesta"
 
 -- The only themes the picker offers. Add/remove dark variants here.
 local THEMES = {
