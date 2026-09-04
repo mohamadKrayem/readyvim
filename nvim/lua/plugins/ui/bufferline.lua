@@ -30,11 +30,10 @@ return {
 				separator_style = { "│", "│" },
 				enforce_regular_tabs = true,
 				always_show_bufferline = true,
-				show_tab_indicators = true, -- show tabpage indicators (lf opens files in tabs)
-				-- A bright bar on the left clearly marks the active buffer/tab.
+				show_tab_indicators = false,
+				-- Active vs inactive tabs are told apart by font color (see highlights).
 				indicator = {
-					icon = "▎",
-					style = "icon",
+					style = "none",
 				},
 				icon_pinned = "󰐃",
 				minimum_padding = 1,
@@ -46,7 +45,16 @@ return {
 				separator = {
 					fg = "#434C5E",
 				},
+				-- Inactive tabs: dim / "sleepy".
+				background = {
+					fg = "#5c6370",
+				},
+				buffer_visible = {
+					fg = "#5c6370",
+				},
+				-- Current tab: bright / "lightning".
 				buffer_selected = {
+					fg = "#ffffff",
 					bold = true,
 					italic = false,
 				},
