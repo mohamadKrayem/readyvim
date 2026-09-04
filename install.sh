@@ -38,6 +38,7 @@ echo "Linking dotfiles from ${DOTFILES/#$HOME/~}"
 link "$DOTFILES/nvim"              "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
 link "$DOTFILES/tmux/tmux.conf"    "$HOME/.tmux.conf"
 link "$DOTFILES/yazi"              "${XDG_CONFIG_HOME:-$HOME/.config}/yazi"
+link "$DOTFILES/lf/lfrc"           "${XDG_CONFIG_HOME:-$HOME/.config}/lf/lfrc"
 link "$DOTFILES/lazygit/config.yml" "$LAZYGIT_DIR/config.yml"
 
 if [ -d "$BACKUP" ]; then

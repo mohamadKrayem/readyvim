@@ -1,0 +1,12 @@
+# lf configuration
+
+# lf's native "open" key is `l` / <right>; also make <enter> open, so pressing
+# Enter on a file sends it back to nvim (opened in a new tab via floaterm).
+map <enter> open
+
+# Quality of life
+set hidden true
+set ignorecase true
+set wrapscan true
+set scrolloff 5
+set info size
