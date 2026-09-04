@@ -1,6 +1,7 @@
 return {
 	"mikavilpas/yazi.nvim",
 	event = "VeryLazy",
+	submodules = false, -- skip integration-test submodules that break `Lazy sync`
 	dependencies = {
 		{ "nvim-lua/plenary.nvim", lazy = true },
 	},
