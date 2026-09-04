@@ -119,7 +119,17 @@ vim.keymap.set("n", "<leader>ut", pick, { desc = "[U]I: pick dark [T]heme" })
 
 return {
 	-- Theme plugins (only their dark variants are offered by the picker).
-	{ "kvrohit/rasmus.nvim", lazy = false },
+	-- rasmus carries the applier: priority = 1 makes it load LAST, so every
+	-- theme is available, then we apply the saved theme here — during startup,
+	-- before the dashboard/first buffer draws (avoids the "stale until reselect").
+	{
+		"kvrohit/rasmus.nvim",
+		lazy = false,
+		priority = 1,
+		config = function()
+			apply(saved())
+		end,
+	},
 	{ "bluz71/vim-moonfly-colors", name = "moonfly", lazy = false },
 	{ "aktersnurra/no-clown-fiesta.nvim", lazy = false },
 	{ "zenbones-theme/zenbones.nvim", lazy = false, dependencies = { "rktjmp/lush.nvim" } },
