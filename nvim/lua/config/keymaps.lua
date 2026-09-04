@@ -242,3 +242,93 @@ end, { desc = "Go to start of current container" })
 map({ "n", "x", "o" }, "]]", function()
 	goto_container_edge("end")
 end, { desc = "Go to end of current container" })
+
+-- ── String text objects ─────────────────────────────────────────────────────
+-- aq / iq select the string the cursor sits in - the whole thing including its
+-- quotes, or just the contents. Treesitter-based, so single quotes, double
+-- quotes, backticks, heredocs and multi-line strings all work the same way
+-- without having to remember which quote character the language uses.
+-- Use them like any text object: vaq, diq, ciq, yaq.
+
+local string_types = {
+	string = true,
+	string_literal = true,
+	interpreted_string_literal = true,
+	raw_string_literal = true,
+	template_string = true,
+	char_literal = true,
+	encapsed_string = true,
+	heredoc = true,
+	heredoc_body = true,
+}
+
+-- Climb from the cursor to the nearest enclosing string node.
+local function enclosing_string()
+	local ok, node = pcall(vim.treesitter.get_node)
+	if not ok or not node then
+		return nil
+	end
+	while node do
+		if string_types[node:type()] then
+			return node
+		end
+		node = node:parent()
+	end
+	return nil
+end
+
+-- The range between the opening and closing delimiters. Grammars model those
+-- delimiters as the first and last children (`"`, string_start/string_end,
+-- and friends), so cutting them off generalises better than assuming a
+-- one-character quote.
+local function inner_range(node)
+	local count = node:child_count()
+	if count >= 2 then
+		local _, _, sr, sc = node:child(0):range()
+		local er, ec = node:child(count - 1):start()
+		return sr, sc, er, ec
+	end
+	-- Leaf string node: strip one quote character from each end.
+	local sr, sc, er, ec = node:range()
+	return sr, sc + 1, er, ec - 1
+end
+
+local function select_string(inner)
+	local node = enclosing_string()
+	if not node then
+		return
+	end
+
+	local sr, sc, er, ec = node:range()
+	if inner then
+		sr, sc, er, ec = inner_range(node)
+		-- Empty string: nothing to select inside, so take the quotes too.
+		if sr > er or (sr == er and sc >= ec) then
+			sr, sc, er, ec = node:range()
+		end
+	end
+
+	-- Ranges are end-exclusive; visual mode wants the last character. A range
+	-- ending at column 0 really ends at the end of the previous line.
+	if ec == 0 and er > sr then
+		er = er - 1
+		ec = #vim.api.nvim_buf_get_lines(0, er, er + 1, false)[1]
+	end
+
+	-- Leave any existing selection first, otherwise `v` would just toggle it off.
+	if vim.fn.mode():match("^[vV\22]") then
+		vim.cmd("normal! \27")
+	end
+
+	vim.api.nvim_win_set_cursor(0, { sr + 1, sc })
+	vim.cmd("normal! v")
+	vim.api.nvim_win_set_cursor(0, { er + 1, math.max(ec - 1, 0) })
+end
+
+map({ "x", "o" }, "aq", function()
+	select_string(false)
+end, { desc = "A string (with quotes)" })
+
+map({ "x", "o" }, "iq", function()
+	select_string(true)
+end, { desc = "Inner string (without quotes)" })

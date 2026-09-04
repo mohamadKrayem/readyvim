@@ -85,6 +85,17 @@ This document provides a comprehensive list of all keyboard shortcuts configured
 | `>`      | Visual | Increase indent and stay in indent mode |
 | `p`      | Visual | Paste without overwriting register      |
 
+## Text Objects
+
+Treesitter-backed, so they work with single quotes, double quotes, backticks,
+f-strings and multi-line strings alike. Use them after any operator: `vaq`,
+`diq`, `ciq`, `yaq`.
+
+| Shortcut | Mode                    | Description                                 |
+| -------- | ----------------------- | ------------------------------------------- |
+| `aq`     | Visual/Operator-pending | Select the whole string, quotes included    |
+| `iq`     | Visual/Operator-pending | Select the string contents, without quotes  |
+
 ## Diagnostics
 
 | Shortcut    | Mode   | Description                       |
