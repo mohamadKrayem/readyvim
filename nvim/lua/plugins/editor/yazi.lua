@@ -1,5 +1,6 @@
 return {
 	"mikavilpas/yazi.nvim",
+	enabled = false, -- disabled on the try-lf branch; testing lf instead
 	event = "VeryLazy",
 	submodules = false, -- skip integration-test submodules that break `Lazy sync`
 	dependencies = {
