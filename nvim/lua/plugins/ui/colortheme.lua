@@ -5,7 +5,7 @@
 -- remembers your choice across restarts.
 
 local state_file = vim.fn.stdpath("state") .. "/colorscheme"
-local DEFAULT = "no-clown-fiesta"
+local DEFAULT = "github_dark_dimmed"
 
 -- The only themes the picker offers. Add/remove dark variants here.
 local THEMES = {
