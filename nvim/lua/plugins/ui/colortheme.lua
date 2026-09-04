@@ -106,6 +106,17 @@ local function pick()
 		:find()
 end
 
+-- Apply the saved theme + register the picker key here (module load = startup),
+-- which always runs — unlike a plugin `init`, which spec-merging can drop.
+apply(saved()) -- best-effort immediate (no flash if the theme is already loaded)
+vim.api.nvim_create_autocmd("VimEnter", {
+	once = true,
+	callback = function()
+		apply(saved()) -- re-apply once every theme plugin has loaded
+	end,
+})
+vim.keymap.set("n", "<leader>ut", pick, { desc = "[U]I: pick dark [T]heme" })
+
 return {
 	-- Theme plugins (only their dark variants are offered by the picker).
 	{ "kvrohit/rasmus.nvim", lazy = false },
@@ -118,24 +129,6 @@ return {
 		priority = 1000,
 		config = function()
 			require("github-theme").setup({}) -- registers the github_* colorschemes
-		end,
-	},
-
-	-- Picker keymap + apply the saved theme at startup (extends telescope).
-	{
-		"nvim-telescope/telescope.nvim",
-		optional = true,
-		keys = {
-			{ "<leader>ut", pick, desc = "[U]I: pick dark [T]heme" },
-		},
-		init = function()
-			apply(saved()) -- best-effort immediate (no flash if already loaded)
-			vim.api.nvim_create_autocmd("VimEnter", {
-				once = true,
-				callback = function()
-					apply(saved()) -- re-apply once every theme plugin has loaded
-				end,
-			})
 		end,
 	},
 }
