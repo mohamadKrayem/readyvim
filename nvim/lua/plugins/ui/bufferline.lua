@@ -30,11 +30,11 @@ return {
 				separator_style = { "│", "│" },
 				enforce_regular_tabs = true,
 				always_show_bufferline = true,
-				show_tab_indicators = false,
-				-- The selected buffer is marked by bold text (see highlights), so
-				-- it needs no extra indicator bar.
+				show_tab_indicators = true, -- show tabpage indicators (lf opens files in tabs)
+				-- A bright bar on the left clearly marks the active buffer/tab.
 				indicator = {
-					style = "none",
+					icon = "▎",
+					style = "icon",
 				},
 				icon_pinned = "󰐃",
 				minimum_padding = 1,
