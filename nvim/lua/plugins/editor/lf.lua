@@ -23,7 +23,9 @@ return {
 		},
 	},
 	init = function()
-		vim.g.floaterm_opener = "tabe" -- open the selected file in a new tab
+		-- Open the picked file as a buffer (shows as a tab in the bufferline,
+		-- single tabpage — so no leftover dashboard tab and :q quits cleanly).
+		vim.g.floaterm_opener = "drop"
 		vim.g.floaterm_borderchars = "─│─│╭╮╯╰"
 
 		-- Blend the floating window with the active colorscheme (and keep it in
