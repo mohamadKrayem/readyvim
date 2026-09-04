@@ -9,6 +9,7 @@ local DEFAULT = "github_dark_dimmed"
 
 -- The only themes the picker offers. Add/remove dark variants here.
 local THEMES = {
+	"moonfly",
 	"github_dark_dimmed",
 	"github_dark",
 	"github_dark_default",
@@ -108,6 +109,7 @@ end
 return {
 	-- Theme plugins (only their dark variants are offered by the picker).
 	{ "kvrohit/rasmus.nvim", lazy = false },
+	{ "bluz71/vim-moonfly-colors", name = "moonfly", lazy = false },
 	{ "aktersnurra/no-clown-fiesta.nvim", lazy = false },
 	{ "zenbones-theme/zenbones.nvim", lazy = false, dependencies = { "rktjmp/lush.nvim" } },
 	{
