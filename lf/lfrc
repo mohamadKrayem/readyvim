@@ -10,3 +10,63 @@ set ignorecase true
 set wrapscan true
 set scrolloff 5
 set info size
+
+# ── Clipboard ───────────────────────────────────────────────────────────────
+# `y` becomes a prefix, so lf's built-in copy (stage files for pasting) moves
+# to `yy`. The rest put text on the system clipboard, ready to paste into nvim.
+#
+# They all work on a multi-file selection too: $fx is the selection, or just
+# the file under the cursor when nothing is selected.
+cmd yank %{{
+	# Only needed for `rel`, but cheap enough to always look up.
+	root=$(git -C "$(dirname -- "$f")" rev-parse --show-toplevel 2>/dev/null)
+
+	out=$(printf '%s\n' "$fx" | while IFS= read -r p; do
+		[ -z "$p" ] && continue
+		# An if-chain rather than a case: macOS /bin/sh is bash 3.2, which
+		# mis-parses a case statement inside $( ).
+		if [ "$1" = name ]; then basename -- "$p"
+		elif [ "$1" = stem ]; then b=$(basename -- "$p"); printf '%s\n' "${b%.*}"
+		elif [ "$1" = dir ]; then dirname -- "$p"
+		# Relative to the repo root, which is what you usually want to paste
+		# into code or a commit message. Falls through to the absolute path
+		# when the file is not in a repo.
+		elif [ "$1" = rel ] && [ -n "$root" ]; then printf '%s\n' "${p#"$root"/}"
+		else printf '%s\n' "$p"
+		fi
+	done)
+
+	printf '%s' "$out" | pbcopy
+	printf 'copied: %s' "$(printf '%s' "$out" | tr '\n' ' ')"
+}}
+
+map y
+map yy copy
+map yn yank name
+map ys yank stem
+map yp yank path
+map yd yank dir
+map yr yank rel
+
+# ── Create & remove ─────────────────────────────────────────────────────────
+# Both prompt for a name; intermediate directories are created as needed.
+cmd mkfile %{{
+	name="$*"
+	[ -z "$name" ] && printf 'usage: mkfile <name>' && exit 0
+	[ -e "$name" ] && printf 'already exists: %s' "$name" && exit 0
+	mkdir -p -- "$(dirname -- "$name")" && touch -- "$name" && printf 'created %s' "$name"
+}}
+
+cmd mkdir %{{
+	name="$*"
+	[ -z "$name" ] && printf 'usage: mkdir <name>' && exit 0
+	mkdir -p -- "$name" && printf 'created %s/' "$name"
+}}
+
+map af push :mkfile<space>
+map ad push :mkdir<space>
+map D delete
+
+# Hand the file to the macOS default app (Preview, browser, ...) rather than
+# opening it back in nvim, which is what <enter> / l already do.
+map o &open "$f"
