@@ -1,37 +1,24 @@
--- Dark-only colorscheme set + a curated picker.
+-- Dark-only colorscheme set + a live picker.
 --
--- <leader>ut opens a picker that lists ONLY the dark themes below (no light
--- variants ever show), previews live as you move, restores on cancel, and
--- remembers your choice across restarts.
+-- Startup ALWAYS uses DEFAULT below — change that one line to change the theme
+-- permanently. <leader>ut opens a picker to try the others for the current
+-- session (not remembered across restarts, by design — predictable startup).
 
-local state_file = vim.fn.stdpath("state") .. "/colorscheme"
 local DEFAULT = "github_dark_dimmed"
 
 -- The only themes the picker offers. Add/remove dark variants here.
 local THEMES = {
-	"moonfly",
 	"github_dark_dimmed",
 	"github_dark",
 	"github_dark_default",
 	"github_dark_high_contrast",
+	"moonfly",
 	"zenbones",
 	"zenwritten",
 	"neobones",
 	"no-clown-fiesta",
 	"rasmus",
 }
-
-local function persist(name)
-	pcall(vim.fn.writefile, { name }, state_file)
-end
-
-local function saved()
-	local ok, lines = pcall(vim.fn.readfile, state_file)
-	if ok and lines and lines[1] and lines[1] ~= "" then
-		return lines[1]
-	end
-	return DEFAULT
-end
 
 local function apply(name)
 	vim.o.background = "dark"
@@ -96,9 +83,7 @@ local function pick()
 				actions.select_default:replace(function()
 					local entry = action_state.get_selected_entry()
 					actions.close(bufnr)
-					local name = entry and entry[1] or DEFAULT
-					apply(name)
-					persist(name)
+					apply(entry and entry[1] or DEFAULT)
 				end)
 				return true
 			end,
@@ -106,28 +91,19 @@ local function pick()
 		:find()
 end
 
--- Apply the saved theme + register the picker key here (module load = startup),
--- which always runs — unlike a plugin `init`, which spec-merging can drop.
-apply(saved()) -- best-effort immediate (no flash if the theme is already loaded)
-vim.api.nvim_create_autocmd("VimEnter", {
-	once = true,
-	callback = function()
-		apply(saved()) -- re-apply once every theme plugin has loaded
-	end,
-})
 vim.keymap.set("n", "<leader>ut", pick, { desc = "[U]I: pick dark [T]heme" })
 
 return {
 	-- Theme plugins (only their dark variants are offered by the picker).
 	-- rasmus carries the applier: priority = 1 makes it load LAST, so every
-	-- theme is available, then we apply the saved theme here — during startup,
-	-- before the dashboard/first buffer draws (avoids the "stale until reselect").
+	-- theme is registered, then we apply DEFAULT here — during startup, before
+	-- the dashboard/first buffer draws (no stale-until-reselect).
 	{
 		"kvrohit/rasmus.nvim",
 		lazy = false,
 		priority = 1,
 		config = function()
-			apply(saved())
+			apply(DEFAULT)
 		end,
 	},
 	{ "bluz71/vim-moonfly-colors", name = "moonfly", lazy = false },
