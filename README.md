@@ -18,7 +18,7 @@ install.sh  symlinks everything into place
 ## Install
 
 ```bash
-git clone git@github.com/mohamadKrayem/readyvim.git ~/personal/dotfiles
+git clone git@github.com:mohamadKrayem/readyvim.git ~/personal/dotfiles
 cd ~/personal/dotfiles
 ./install.sh
 ```
@@ -30,7 +30,7 @@ To try the Neovim config without touching an existing one — no symlinks, no
 `install.sh`, nothing written outside the clone:
 
 ```bash
-git clone git@github.com/mohamadKrayem/readyvim.git ~/personal/dotfiles
+git clone git@github.com:mohamadKrayem/readyvim.git ~/personal/dotfiles
 XDG_CONFIG_HOME=~/personal/dotfiles nvim
 ```
 
