@@ -18,7 +18,7 @@ install.sh  symlinks everything into place
 ## Install
 
 ```bash
-git clone <this-repo> ~/personal/dotfiles
+git clone git@github.com/mohamadKrayem/readyvim.git ~/personal/dotfiles
 cd ~/personal/dotfiles
 ./install.sh
 ```
