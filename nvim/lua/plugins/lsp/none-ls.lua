@@ -9,6 +9,40 @@ return {
 		local formatting = null_ls.builtins.formatting -- to setup formatters
 		local diagnostics = null_ls.builtins.diagnostics -- to setup linters
 
+		-- eslint_d answers with plain text ("Error: Could not find config
+		-- file.") when a project has no eslint setup, and none-ls hands that
+		-- straight to a JSON parser - which is where the "failed to decode
+		-- json: Expected value but found invalid token at character 1" popup
+		-- on every TS buffer comes from. So only run it where there is
+		-- actually a config for it to read.
+		local eslint_config_files = {
+			".eslintrc",
+			".eslintrc.js",
+			".eslintrc.cjs",
+			".eslintrc.json",
+			".eslintrc.yaml",
+			".eslintrc.yml",
+			"eslint.config.js",
+			"eslint.config.mjs",
+			"eslint.config.cjs",
+			"eslint.config.ts",
+			"eslint.config.mts",
+		}
+
+		local function has_eslint_config(utils)
+			if utils.root_has_file(eslint_config_files) then
+				return true
+			end
+
+			-- A package.json can carry the config inline instead.
+			local package_json = vim.fn.findfile("package.json", ".;")
+			if package_json == "" then
+				return false
+			end
+			local ok, manifest = pcall(vim.json.decode, table.concat(vim.fn.readfile(package_json), "\n"))
+			return ok and type(manifest) == "table" and manifest.eslintConfig ~= nil
+		end
+
 		-- Formatters & linters for mason to install
 		require("mason-null-ls").setup({
 			ensure_installed = {
@@ -44,7 +78,7 @@ return {
 				},
 			}),
 			-- ESLint diagnostics for JS/TS/React (uses the project's eslint config).
-			require("none-ls.diagnostics.eslint_d"),
+			require("none-ls.diagnostics.eslint_d").with({ condition = has_eslint_config }),
 			formatting.stylua,
 			formatting.shfmt.with({ args = { "-i", "4" } }),
 			formatting.terraform_fmt,
