@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# Pick a project, get a tmux session laid out for it: nvim on the left,
+# claude on the right. Bound to `prefix + f`; see tmux/tmux.conf.
+#
+# A session per project is what makes switching cheap - nothing is torn down,
+# so nvim keeps its tabs and LSP clients and claude keeps its conversation.
+# Coming back is `prefix + s`, or `prefix + Shift-Tab` for the last one.
+#
+# Takes a directory as an argument to skip the picker.
+set -euo pipefail
+
+# Where projects live, one level deep. Override by exporting
+# TMUX_SESSIONIZER_PATHS as a colon-separated list.
+IFS=':' read -r -a roots <<< "${TMUX_SESSIONIZER_PATHS:-$HOME/Dev:$HOME/personal:$HOME/.config}"
+
+# Fraction of the width given to claude.
+SIDE_WIDTH="${TMUX_SESSIONIZER_SIDE_WIDTH:-35%}"
+
+list_projects() {
+	local existing=()
+	local root
+	for root in "${roots[@]}"; do
+		[ -d "$root" ] && existing+=("$root")
+	done
+	[ ${#existing[@]} -eq 0 ] && return 0
+
+	if command -v fd >/dev/null 2>&1; then
+		fd --min-depth 1 --max-depth 1 --type d . "${existing[@]}" 2>/dev/null
+	else
+		find "${existing[@]}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null
+	fi
+}
+
+if [ $# -ge 1 ]; then
+	selected="$1"
+else
+	selected=$(list_projects | sed 's:/*$::' | sort -u |
+		fzf --prompt='project> ' --height=100% --reverse --border) || exit 0
+fi
+
+[ -z "${selected:-}" ] && exit 0
+[ -d "$selected" ] || { printf 'not a directory: %s\n' "$selected" >&2; exit 1; }
+
+# tmux treats . and : as address separators, so they cannot appear in a name.
+name=$(basename "$selected" | tr '.:' '__')
+
+if ! tmux has-session -t="$name" 2>/dev/null; then
+	# Run each tool as the pane's command rather than typing it into a shell:
+	# send-keys races the shell's startup, and a slow zsh init happily
+	# swallows the first character ("nvim ." arriving as "vim ."). Handing
+	# over to $SHELL afterwards keeps the pane usable once you quit.
+	shell_after='exec "${SHELL:-/bin/sh}"'
+
+	tmux new-session -d -s "$name" -c "$selected" "nvim . ; $shell_after"
+
+	if command -v claude >/dev/null 2>&1; then
+		side_cmd="claude ; $shell_after"
+	else
+		side_cmd="$shell_after"
+	fi
+
+	# Address the pane by id rather than index - pane-base-index makes the
+	# numbering config-dependent, ids never move.
+	editor=$(tmux list-panes -t "$name" -F '#{pane_id}' | head -1)
+	tmux split-window -h -l "$SIDE_WIDTH" -t "$editor" -c "$selected" "$side_cmd"
+	tmux select-pane -t "$editor"
+fi
+
+if [ -n "${TMUX:-}" ]; then
+	tmux switch-client -t "$name"
+else
+	tmux attach-session -t "$name"
+fi
