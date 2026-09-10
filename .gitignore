@@ -1,0 +1,6 @@
+# Runtime state, not configuration
+lazygit/state.yml
+
+# OS / editor cruft
+.DS_Store
+*.swp
