@@ -2,6 +2,8 @@
 
 > A dark, batteries-included Neovim + tmux config. nvim, tmux, lazygit & lf wired to work as one.
 
+**[mohamadkrayem.github.io/readyvim-site](https://mohamadkrayem.github.io/readyvim-site/)** — install steps, keymaps and the rest, on one page.
+
 Configuration for the tools I actually live in: Neovim, tmux, lf and lazygit.
 They're wired together — the same `Ctrl+h/j/k/l` crosses nvim splits and tmux panes,
 lazygit opens files back into the nvim instance that launched it, and lf runs as
