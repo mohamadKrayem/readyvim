@@ -1,16 +1,17 @@
 # ReadyVim
 
-> A dark, batteries-included Neovim + tmux config. nvim, tmux, lazygit & yazi wired to work as one.
+> A dark, batteries-included Neovim + tmux config. nvim, tmux, lazygit & lf wired to work as one.
 
-Configuration for the four tools I actually live in: Neovim, tmux, yazi and lazygit.
+Configuration for the tools I actually live in: Neovim, tmux, lf and lazygit.
 They're wired together — the same `Ctrl+h/j/k/l` crosses nvim splits and tmux panes,
-lazygit opens files back into the nvim instance that launched it, and yazi runs as
-the file manager inside nvim.
+lazygit opens files back into the nvim instance that launched it, and lf runs as
+the file manager inside nvim (`<leader>-`), replacing netrw.
 
 ```
 nvim/       Neovim config (lazy.nvim)
-tmux/       standalone tmux.conf — no oh-my-tmux, no framework
-yazi/       yazi file manager
+tmux/       standalone tmux.conf + tmux-sessionizer, the project switcher
+lf/         lf file manager — the one nvim opens
+yazi/       yazi file manager — kept, but disabled in favour of lf
 lazygit/    lazygit, including the "open in parent nvim" integration
 install.sh  symlinks everything into place
 ```
@@ -60,6 +61,8 @@ the Neovim plugins, and drops you into a themed tmux session. See
 | node | several LSP servers |
 | python3 | basedpyright, debugpy |
 | tmux | 3.2+ (floating popups) |
+| fzf | `prefix + f` project switcher |
+| lf | file manager, opened from nvim and as netrw's replacement |
 | lazygit, yazi | optional, but the integrations expect them |
 
 A **Nerd Font** is required for Neovim — the statusline, bufferline and diagnostic
@@ -87,6 +90,24 @@ imports folders, not individual files.
 
 See [nvim/SHORTCUTS.md](nvim/SHORTCUTS.md) for the full keymap reference.
 
+## lf
+
+The file manager nvim opens with `<leader>-` (with the cursor already on the
+current file) and `<leader>cw` (working directory). It also takes over netrw,
+so `nvim .` lands in lf.
+
+`y` is a prefix for the clipboard, so the built-in copy is `yy`:
+
+| key | copies |
+|---|---|
+| `yn` / `ys` | file name / name without extension |
+| `yp` / `yd` | absolute path / containing directory |
+| `yr` | path relative to the repo root |
+
+`af` / `ad` create a file / directory, `D` deletes (with confirmation), `o`
+opens with the system default app. Multi-file selections work throughout.
+Clipboard support is macOS-only (`pbcopy`).
+
 ## tmux
 
 Standalone, no framework. Prefix is `Ctrl+b` (with `Ctrl+a` as a second prefix).
@@ -95,3 +116,10 @@ prefix to move seamlessly between nvim splits and tmux panes.
 
 Floating popups: `prefix + t` scratch shell, `prefix + g` lazygit, `prefix + e`
 edit this config. In copy-mode, `Ctrl+p` / `Ctrl+n` jump 8 lines.
+
+A session per project, so switching away and back costs nothing — nvim keeps
+its tabs and LSP clients, and whatever is running in the other pane keeps its
+state. `prefix + f` fzf-picks a project and switches to its session, creating
+it on first use with nvim and claude side by side (`tmux/tmux-sessionizer`,
+roots configurable via `TMUX_SESSIONIZER_PATHS`). `prefix + s` lists sessions,
+`prefix + Shift-Tab` bounces back to the last one.

@@ -96,6 +96,32 @@ f-strings and multi-line strings alike. Use them after any operator: `vaq`,
 | `aq`     | Visual/Operator-pending | Select the whole string, quotes included    |
 | `iq`     | Visual/Operator-pending | Select the string contents, without quotes  |
 
+## File Manager (lf)
+
+| Shortcut     | Mode   | Description                                        |
+| ------------ | ------ | -------------------------------------------------- |
+| `<leader>-`  | Normal | Open lf, cursor on the current file                |
+| `<leader>cw` | Normal | Open lf in the working directory                   |
+
+Opening a directory (`nvim .`) launches lf instead of netrw, and picking a file
+replaces the current buffer. lf's own keys are listed in the README.
+
+## Projects & Sessions
+
+Switching project changes only this nvim - a neighbouring tmux pane (claude, a
+dev server) is left alone. Sessions are keyed by directory and never restored
+automatically; you ask for one.
+
+| Shortcut     | Mode   | Description                                       |
+| ------------ | ------ | ------------------------------------------------- |
+| `<leader>sp` | Normal | Pick a project — saves this one, restores that one |
+| `<leader>sP` | Normal | Bounce back to the previous project                |
+| `<leader>sl` | Normal | Restore the session for the current directory      |
+
+Also available as `:Projects` and `:ProjectSwitch <path>`. Project roots are
+`~/Dev`, `~/personal` and `~/.config`, overridable with `TMUX_SESSIONIZER_PATHS`
+— the same variable the tmux sessionizer reads.
+
 ## Diagnostics
 
 | Shortcut    | Mode   | Description                       |
