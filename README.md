@@ -92,6 +92,23 @@ imports folders, not individual files.
 
 See [nvim/SHORTCUTS.md](nvim/SHORTCUTS.md) for the full keymap reference.
 
+## Projects & worktrees
+
+`<leader>sp` picks a project and switches this nvim to it: the current
+directory's session is saved, its buffers and LSP clients are dropped, and the
+target's session is restored with its tabs and splits. `<leader>sP` bounces
+back to the previous one. Only nvim moves, so a neighbouring tmux pane running
+a server or a log tail stays where it is.
+
+`<leader>gw` does the same for the worktrees of the repo you are in, listing
+each one by branch and marking the one you are currently in. Switching
+worktrees is switching directory, so each keeps its own session.
+
+Sessions are keyed by directory and never restored automatically — startup
+stays predictable, and `<leader>sl` restores one when you want it. Project
+roots come from `TMUX_SESSIONIZER_PATHS`, the same variable the tmux
+sessionizer reads, so both pickers agree on what counts as a project.
+
 ## lf
 
 The file manager nvim opens with `<leader>-` (with the cursor already on the

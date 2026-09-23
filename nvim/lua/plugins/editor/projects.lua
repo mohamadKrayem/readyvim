@@ -75,29 +75,26 @@ function M.switch(dir)
 	end
 end
 
-function M.pick()
-	local dirs = project_dirs()
-	if vim.tbl_isempty(dirs) then
-		vim.notify("No project directories found under: " .. table.concat(project_roots(), ", "), vim.log.levels.WARN)
-		return
-	end
+-- ~/Dev/foo reads better than the full absolute path.
+local function tilde(path)
+	return (path:gsub("^" .. vim.pesc(vim.env.HOME), "~"))
+end
 
+-- One picker for both lists. Items are { path = ..., display = ... }.
+local function choose(title, items)
 	local pickers = require("telescope.pickers")
 	local finders = require("telescope.finders")
 	local actions = require("telescope.actions")
 	local action_state = require("telescope.actions.state")
 	local conf = require("telescope.config").values
-	local home = vim.env.HOME
 
 	pickers
 		.new({}, {
-			prompt_title = "Projects",
+			prompt_title = title,
 			finder = finders.new_table({
-				results = dirs,
-				entry_maker = function(dir)
-					-- ~/Dev/foo reads better than the full absolute path.
-					local display = dir:gsub("^" .. vim.pesc(home), "~")
-					return { value = dir, display = display, ordinal = display }
+				results = items,
+				entry_maker = function(item)
+					return { value = item.path, display = item.display, ordinal = item.display }
 				end,
 			}),
 			sorter = conf.generic_sorter({}),
@@ -113,6 +110,72 @@ function M.pick()
 			end,
 		})
 		:find()
+end
+
+function M.pick()
+	local dirs = project_dirs()
+	if vim.tbl_isempty(dirs) then
+		vim.notify("No project directories found under: " .. table.concat(project_roots(), ", "), vim.log.levels.WARN)
+		return
+	end
+
+	local items = {}
+	for _, dir in ipairs(dirs) do
+		table.insert(items, { path = dir, display = tilde(dir) })
+	end
+	choose("Projects", items)
+end
+
+-- Every worktree of the repo the current directory belongs to. The porcelain
+-- format is one "worktree <path>" line per tree, each followed by "branch
+-- refs/heads/<name>", "detached" or "bare".
+local function worktrees()
+	local out = vim.fn.systemlist({ "git", "-C", vim.fn.getcwd(), "worktree", "list", "--porcelain" })
+	if vim.v.shell_error ~= 0 then
+		return nil
+	end
+
+	local trees, tree = {}, nil
+	for _, line in ipairs(out) do
+		local path = line:match("^worktree (.+)$")
+		if path then
+			tree = { path = vim.fs.normalize(path), label = "detached" }
+			table.insert(trees, tree)
+		elseif tree then
+			local branch = line:match("^branch refs/heads/(.+)$")
+			if branch then
+				tree.label = branch
+			elseif line == "bare" then
+				tree.label = "bare"
+			end
+		end
+	end
+	return trees
+end
+
+-- Switching worktree is switching directory, so it goes through M.switch like
+-- anything else: this worktree's session is saved, the target's is restored.
+function M.pick_worktree()
+	local trees = worktrees()
+	if not trees then
+		vim.notify("Not inside a git repository", vim.log.levels.WARN)
+		return
+	end
+	if #trees < 2 then
+		vim.notify("This repository has no other worktrees", vim.log.levels.INFO)
+		return
+	end
+
+	local here = vim.fs.normalize(vim.fn.getcwd())
+	local items = {}
+	for _, tree in ipairs(trees) do
+		table.insert(items, {
+			path = tree.path,
+			-- Branch first: that is what you are actually picking between.
+			display = string.format("%s %-24s %s", tree.path == here and "*" or " ", tree.label, tilde(tree.path)),
+		})
+	end
+	choose("Worktrees", items)
 end
 
 return {
@@ -135,10 +198,15 @@ return {
 		vim.api.nvim_create_user_command("ProjectSwitch", function(o)
 			M.switch(o.args)
 		end, { nargs = 1, complete = "dir", desc = "Switch to a project by path" })
+
+		vim.api.nvim_create_user_command("Worktrees", function()
+			M.pick_worktree()
+		end, { desc = "Switch to another worktree of this repo" })
 	end,
 
 	keys = {
 		{ "<leader>sp", M.pick, desc = "[S]witch [P]roject" },
+		{ "<leader>gw", M.pick_worktree, desc = "[G]it [W]orktree: switch to another" },
 		{
 			"<leader>sP",
 			function()

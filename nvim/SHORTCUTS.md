@@ -117,8 +117,14 @@ automatically; you ask for one.
 | `<leader>sp` | Normal | Pick a project — saves this one, restores that one |
 | `<leader>sP` | Normal | Bounce back to the previous project                |
 | `<leader>sl` | Normal | Restore the session for the current directory      |
+| `<leader>gw` | Normal | Switch to another worktree of this repo            |
 
-Also available as `:Projects` and `:ProjectSwitch <path>`. Project roots are
+Worktrees go through the same path as projects: the current directory's session
+is saved and the target's restored, so each worktree keeps its own tabs and
+buffers. The picker lists every worktree with its branch and marks the one you
+are in.
+
+Also available as `:Projects`, `:ProjectSwitch <path>` and `:Worktrees`. Project roots are
 `~/Dev`, `~/personal` and `~/.config`, overridable with `TMUX_SESSIONIZER_PATHS`
 — the same variable the tmux sessionizer reads.
 
