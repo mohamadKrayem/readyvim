@@ -15,7 +15,7 @@ That builds the image and drops you into a **themed tmux session**. From there:
 
 - type `nvim` — the config is live (first launch installs the LSPs/debug
   adapters via Mason, ~1 minute)
-- `prefix + g` — lazygit in a floating popup
+- `prefix + g` — lazygit in a floating popup (the prefix is `Ctrl+Space`)
 - `Ctrl+h/j/k/l` — move seamlessly between nvim splits and tmux panes
 - `yazi` — the file manager
 

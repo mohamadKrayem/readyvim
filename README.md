@@ -66,6 +66,7 @@ the Neovim plugins, and drops you into a themed tmux session. See
 | fzf | `prefix + f` project switcher |
 | lf | file manager, opened from nvim and as netrw's replacement |
 | lazygit, yazi | optional, but the integrations expect them |
+| ipykernel | optional, for the Python REPL (see below) |
 
 A **Nerd Font** is required for Neovim — the statusline, bufferline and diagnostic
 signs all use glyphs. The tmux config is deliberately ASCII-only and needs no
@@ -109,6 +110,34 @@ stays predictable, and `<leader>sl` restores one when you want it. Project
 roots come from `TMUX_SESSIONIZER_PATHS`, the same variable the tmux
 sessionizer reads, so both pickers agree on what counts as a project.
 
+## Python REPL
+
+[jet.nvim](https://github.com/wurli/jet.nvim) runs a Jupyter kernel in a
+terminal split and sends code to it from the buffer:
+
+| key | does |
+|---|---|
+| `<leader>rr` | toggle the REPL, starting a kernel if none is running |
+| `<leader>rs` | send the expression under the cursor and move to the next one; in visual mode, send the selection |
+| `<leader>ro` | `:Jet`, the kernel manager (start, stop, rename) |
+
+An expression is a whole statement, `def`, `class` or `for` block, so pressing
+`<leader>rs` repeatedly walks through a script. A kernel from the project's own
+virtualenv is preferred over the global one.
+
+Two things are needed once. The first `:Jet` asks to download jet's engine
+(answer `y`, or run `:Jet install`). And there has to be a Python kernel:
+
+```bash
+# once, for every project: a global kernel in its own venv
+uv venv ~/.local/share/jupyter-kernel-venv
+uv pip install --python ~/.local/share/jupyter-kernel-venv/bin/python ipykernel
+~/.local/share/jupyter-kernel-venv/bin/python -m ipykernel install --user --name python3
+
+# per project, so the REPL sees the project's packages
+uv add --dev ipykernel
+```
+
 ## lf
 
 The file manager nvim opens with `<leader>-` (with the cursor already on the
@@ -129,7 +158,8 @@ Clipboard support is macOS-only (`pbcopy`).
 
 ## tmux
 
-Standalone, no framework. Prefix is `Ctrl+b` (with `Ctrl+a` as a second prefix).
+Standalone, no framework. The prefix is `Ctrl+Space`, and it's the only one.
+Press it twice to send a real `Ctrl+Space` to the program in the pane.
 Splits `-` / `_`, pane movement `prefix + h/j/k/l`, and `Ctrl+h/j/k/l` without a
 prefix to move seamlessly between nvim splits and tmux panes.
 
@@ -141,4 +171,5 @@ its tabs and LSP clients, and whatever is running in the other pane keeps its
 state. `prefix + f` fzf-picks a project and switches to its session, creating
 it on first use with nvim and claude side by side (`tmux/tmux-sessionizer`,
 roots configurable via `TMUX_SESSIONIZER_PATHS`). `prefix + s` lists sessions,
-`prefix + Shift-Tab` bounces back to the last one.
+`prefix + Ctrl+f` fzf-picks one of the open sessions, and `prefix + Shift-Tab`
+bounces back to the last one.

@@ -22,6 +22,20 @@ This document provides a comprehensive list of all keyboard shortcuts configured
 | `<C-,>`  | Insert | Cycle to previous AI completion |
 | `<C-x>`  | Insert | Clear AI suggestions            |
 
+## Completion Menu
+
+| Shortcut      | Mode   | Description                                   |
+| ------------- | ------ | --------------------------------------------- |
+| `<C-n>`       | Insert | Next item                                     |
+| `<C-p>`       | Insert | Previous item                                 |
+| `<C-y>`       | Insert | Accept the selected item                      |
+| `<C-Space>`   | Insert | Open the menu manually (press twice in tmux)  |
+| `<C-b>`       | Insert | Scroll the docs window up                     |
+| `<C-f>`       | Insert | Scroll the docs window down                   |
+
+`<C-Space>` is the tmux prefix, so inside tmux it takes two presses to reach
+nvim. The menu opens on its own as you type, so this is rarely needed.
+
 ## General Editing
 
 | Shortcut     | Mode          | Description                                         |
@@ -127,6 +141,17 @@ are in.
 Also available as `:Projects`, `:ProjectSwitch <path>` and `:Worktrees`. Project roots are
 `~/Dev`, `~/personal` and `~/.config`, overridable with `TMUX_SESSIONIZER_PATHS`
 — the same variable the tmux sessionizer reads.
+
+## Python REPL (jet.nvim)
+
+| Shortcut     | Mode   | Description                                          |
+| ------------ | ------ | ---------------------------------------------------- |
+| `<leader>rr` | Normal | Toggle the REPL, starting a kernel if needed         |
+| `<leader>rs` | Normal | Send the expression under the cursor, move to next   |
+| `<leader>rs` | Visual | Send the selection                                   |
+| `<leader>ro` | Normal | Open `:Jet`, the kernel manager                      |
+
+Needs a Python kernel (ipykernel); setup is in the README.
 
 ## Diagnostics
 
