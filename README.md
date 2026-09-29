@@ -138,6 +138,25 @@ uv pip install --python ~/.local/share/jupyter-kernel-venv/bin/python ipykernel
 uv add --dev ipykernel
 ```
 
+## Notes
+
+[obsidian.nvim](https://github.com/obsidian-nvim/obsidian.nvim) turns
+`~/personal/notes` into a notes vault: plain Markdown files that link to each
+other. The Obsidian app isn't needed, though it can open the same folder.
+
+| key | does |
+|---|---|
+| `<leader>on` | new note (the title becomes the file name: `Meeting notes` → `meeting-notes.md`) |
+| `<leader>ot` | today's daily note, in `daily/` |
+| `<leader>of` | find a note by name |
+| `<leader>os` | search inside all notes |
+| `<leader>ob` | backlinks: notes that link to this one |
+
+Inside a note, typing `[[` completes note names, `Enter` follows a link or
+toggles a checkbox, and `]o` / `[o` jump between links. markview does the
+rendering. The plugin only loads for files in the vault, or when you use one
+of the keys above.
+
 ## lf
 
 The file manager nvim opens with `<leader>-` (with the cursor already on the

@@ -153,6 +153,21 @@ Also available as `:Projects`, `:ProjectSwitch <path>` and `:Worktrees`. Project
 
 Needs a Python kernel (ipykernel); setup is in the README.
 
+## Notes (obsidian.nvim)
+
+Vault: `~/personal/notes`.
+
+| Shortcut     | Mode             | Description                                  |
+| ------------ | ---------------- | -------------------------------------------- |
+| `<leader>on` | Normal           | New note                                     |
+| `<leader>ot` | Normal           | Today's daily note                           |
+| `<leader>of` | Normal           | Find a note by name                          |
+| `<leader>os` | Normal           | Search inside notes                          |
+| `<leader>ob` | Normal           | Backlinks to the current note                |
+| `[[`         | Insert (in note) | Complete a link to another note              |
+| `<CR>`       | Normal (in note) | Follow the link / toggle the checkbox        |
+| `]o` / `[o`  | Normal (in note) | Next / previous link                         |
+
 ## Diagnostics
 
 | Shortcut    | Mode   | Description                       |
