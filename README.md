@@ -115,7 +115,7 @@ pastes `@path/to/file` into it; on a visual selection it pastes the path, the
 line range and the code. Nothing is submitted — focus moves to claude so you
 type the question and press Enter yourself.
 
-`prefix + a` collapses the claude pane: the editor fills the window while
+`prefix + ;` collapses the claude pane: the editor fills the window while
 claude keeps running out of sight, and the window's tab shows `[zoomed]`.
 Press it again — or move into it with `Ctrl+l` — and the old layout comes back
 exactly, same split and width.
@@ -224,7 +224,7 @@ Splits `-` / `_`, pane movement `prefix + h/j/k/l`, and `Ctrl+h/j/k/l` without a
 prefix to move seamlessly between nvim splits and tmux panes.
 
 Floating popups: `prefix + t` scratch shell, `prefix + g` lazygit, `prefix + e`
-edit this config, `prefix + n` today's note. `prefix + a` collapses / expands
+edit this config, `prefix + n` today's note. `prefix + ;` collapses / expands
 the claude pane (see Claude). In copy-mode, `Ctrl+p` / `Ctrl+n`
 jump 8 lines.
 

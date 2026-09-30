@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Collapse / expand the claude pane of the current window. Bound to
-# `prefix + a`; see tmux/tmux.conf.
+# `prefix + ;`; see tmux/tmux.conf.
 #
 # Collapsing zooms the editor pane to fill the window. claude is not closed -
 # it keeps running out of sight - and expanding un-zooms, which puts back the
