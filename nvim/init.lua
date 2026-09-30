@@ -11,6 +11,7 @@ vim.g.maplocalleader = " "
 
 require("config.options")
 require("config.keymaps")
+require("config.claude")
 require("config.lazy")
 
 -- Loaded last on purpose: these override colorscheme highlight groups.
