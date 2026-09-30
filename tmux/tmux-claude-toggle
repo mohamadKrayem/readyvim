@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Collapse / expand the claude pane of the current window. Bound to
+# `prefix + a`; see tmux/tmux.conf.
+#
+# Collapsing zooms the editor pane to fill the window. claude is not closed -
+# it keeps running out of sight - and expanding un-zooms, which puts back the
+# exact layout from before: same split, same width. Moving into the hidden
+# pane (Ctrl+l) expands it as well, since tmux un-zooms on pane changes.
+set -euo pipefail
+
+if [ "$(tmux display -p '#{window_zoomed_flag}')" = 1 ]; then
+	tmux resize-pane -Z
+	exit 0
+fi
+
+# claude renames its process to its version number, so look at the process
+# arguments of each pane rather than pane_current_command.
+claude_pane=""
+while read -r id tty; do
+	if ps -o args= -t "$tty" | grep -qE '(^|/)claude( |$)'; then
+		claude_pane="$id"
+		break
+	fi
+done < <(tmux list-panes -F '#{pane_id} #{pane_tty}')
+
+if [ -z "$claude_pane" ]; then
+	tmux display "No claude pane in this window"
+	exit 0
+fi
+
+# Zoom whichever pane is not claude. If claude has focus, hand it back to the
+# pane you came from (or the first other one) before zooming.
+if [ "$(tmux display -p '#{pane_id}')" = "$claude_pane" ]; then
+	tmux select-pane -l 2>/dev/null || true
+	if [ "$(tmux display -p '#{pane_id}')" = "$claude_pane" ]; then
+		other=$(tmux list-panes -F '#{pane_id}' | grep -vxF "$claude_pane" | head -1)
+		[ -z "$other" ] && { tmux display "claude is the only pane here"; exit 0; }
+		tmux select-pane -t "$other"
+	fi
+fi
+
+tmux resize-pane -Z
