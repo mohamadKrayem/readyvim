@@ -42,6 +42,18 @@ link "$DOTFILES/yazi"              "${XDG_CONFIG_HOME:-$HOME/.config}/yazi"
 link "$DOTFILES/lf/lfrc"           "${XDG_CONFIG_HOME:-$HOME/.config}/lf/lfrc"
 link "$DOTFILES/lazygit/config.yml" "$LAZYGIT_DIR/config.yml"
 
+# tmux plugins, loaded straight from tmux.conf (no plugin manager): resurrect
+# saves and restores sessions, continuum does it automatically.
+for plugin in tmux-resurrect tmux-continuum; do
+	dest="$HOME/.tmux/plugins/$plugin"
+	if [ -d "$dest" ]; then
+		printf '  ok       %s\n' "${dest/#$HOME/~}"
+	else
+		git clone --quiet --depth 1 "https://github.com/tmux-plugins/$plugin" "$dest"
+		printf '  cloned   %s\n' "${dest/#$HOME/~}"
+	fi
+done
+
 if [ -d "$BACKUP" ]; then
 	echo
 	echo "Replaced files saved in: ${BACKUP/#$HOME/~}"
