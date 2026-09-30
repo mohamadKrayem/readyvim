@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Work on another branch side by side: pick (or type) a branch of the repo in
+# the current pane, and get it as a git worktree with its own tmux session -
+# nvim and claude, like any other project. Bound to `prefix + W`.
+#
+# The worktree lands next to the main checkout, named <repo>-<branch>
+# (~/personal/api -> ~/personal/api-fix-login), so it also shows up in the
+# project pickers. A branch that already has a worktree just opens it.
+set -euo pipefail
+
+dir="${1:-$PWD}"
+if ! git -C "$dir" rev-parse --git-dir >/dev/null 2>&1; then
+	printf 'Not inside a git repository: %s\n' "$dir" >&2
+	read -r -n 1 -s -p 'Press any key to close'
+	exit 1
+fi
+
+# The main checkout is always the first entry, even when run from inside
+# another worktree - so new worktrees never nest inside each other.
+main=$(git -C "$dir" worktree list --porcelain | sed -n '1s/^worktree //p')
+repo=$(basename "$main")
+
+# Local branches first, then remote ones that have no local copy yet. fzf's
+# --print-query puts what was typed on the first line, so a name that is not
+# in the list creates a new branch.
+branches() {
+	git -C "$main" for-each-ref --format='%(refname:short)' refs/heads
+	git -C "$main" for-each-ref --format='%(refname:lstrip=3)' refs/remotes |
+		grep -v '^HEAD$' | sort -u |
+		grep -vxF -f <(git -C "$main" for-each-ref --format='%(refname:short)' refs/heads) || true
+}
+
+out=$(branches | fzf --print-query --prompt="$repo branch> " --height=100% --reverse --border \
+	--header='Enter: open or create a worktree   (type a new name for a new branch)') || true
+query=$(sed -n 1p <<<"$out")
+pick=$(sed -n 2p <<<"$out")
+branch="${pick:-$query}"
+[ -z "$branch" ] && exit 0
+
+# Already checked out somewhere? Open that worktree instead of making another.
+existing=$(git -C "$main" worktree list --porcelain | awk -v b="refs/heads/$branch" '
+	/^worktree / { path = substr($0, 10) }
+	$0 == "branch " b { print path; exit }')
+
+if [ -n "$existing" ]; then
+	target="$existing"
+else
+	target="$(dirname "$main")/$repo-${branch//\//-}"
+	if git -C "$main" show-ref --verify --quiet "refs/heads/$branch"; then
+		git -C "$main" worktree add "$target" "$branch"
+	elif git -C "$main" show-ref --quiet "refs/remotes/origin/$branch"; then
+		git -C "$main" worktree add --track -b "$branch" "$target" "origin/$branch"
+	else
+		git -C "$main" worktree add -b "$branch" "$target"
+	fi
+fi
+
+exec "$(dirname "$(readlink -f "$0")")/tmux-sessionizer" "$target"
