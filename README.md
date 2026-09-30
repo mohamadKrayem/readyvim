@@ -11,11 +11,11 @@ the file manager inside nvim (`<leader>-`), replacing netrw.
 
 ```
 nvim/       Neovim config (lazy.nvim)
-tmux/       standalone tmux.conf + tmux-sessionizer, the project switcher
+tmux/       standalone tmux.conf, tmux-sessionizer (projects), tmux-worktree (branches)
 lf/         lf file manager — the one nvim opens
 yazi/       yazi file manager — kept, but disabled in favour of lf
 lazygit/    lazygit, including the "open in parent nvim" integration
-install.sh  symlinks everything into place
+install.sh  symlinks everything into place, clones the two tmux plugins
 ```
 
 ## Install
@@ -82,6 +82,7 @@ lua/config/
   lazy.lua            lazy.nvim bootstrap + which plugin folders to import
   options.lua         editor settings
   keymaps.lua         global keymaps (plugin keymaps live with their plugin)
+  claude.lua          send code to the claude pane (<leader>ac)
   diagnostics.lua     diagnostic appearance
   autocmds.lua        autocommands
 lua/plugins/
@@ -92,6 +93,35 @@ Adding a plugin means dropping a file into the matching folder — `lua/config/l
 imports folders, not individual files.
 
 See [nvim/SHORTCUTS.md](nvim/SHORTCUTS.md) for the full keymap reference.
+
+## Moving and editing
+
+| key | does |
+|---|---|
+| `s` + letters + label | jump anywhere on screen ([flash.nvim](https://github.com/folke/flash.nvim)); `S` selects the treesitter node around the cursor |
+| `gsa` / `gsd` / `gsr` | add / delete / replace surrounding quotes, brackets, tags: `gsaiw"` wraps a word, `gsr"'` swaps the quotes |
+| `<leader>fr` | find and replace across the project with a live preview ([grug-far](https://github.com/MagicDuck/grug-far.nvim)); `Space r` applies it |
+| `<leader>U` | undo history as a tree, including branches plain `u` can't reach |
+| `[x` | jump up to the function or block pinned at the top of the window |
+
+The enclosing function, class or block stays pinned at the top while you scroll
+through it. `f` / `t` are plain vim; flash only takes `s`, which is why
+surround lives under `gs`.
+
+## Claude
+
+With claude in the next tmux pane (the sessionizer's layout), `<leader>ac`
+pastes `@path/to/file` into it; on a visual selection it pastes the path, the
+line range and the code. Nothing is submitted — focus moves to claude so you
+type the question and press Enter yourself.
+
+## Git review
+
+[diffview.nvim](https://github.com/sindrets/diffview.nvim) shows changes the way
+a pull request does: changed files on the left, a side-by-side diff on the
+right. `<leader>gd` opens every uncommitted change, `<leader>gh` the history of
+the current file, `<leader>gH` the branch's history. The same key or `q` closes
+it; `-` stages the file under the cursor. lazygit is still the place to commit.
 
 ## Projects & worktrees
 
@@ -104,6 +134,12 @@ a server or a log tail stays where it is.
 `<leader>gw` does the same for the worktrees of the repo you are in, listing
 each one by branch and marking the one you are currently in. Switching
 worktrees is switching directory, so each keeps its own session.
+
+To work on two branches side by side instead, `prefix + W` in tmux picks a
+branch of the repo in the current pane — or takes a new name — creates the
+worktree next to the repo as `<repo>-<branch>`, and opens it as its own tmux
+session with nvim and claude. Picking a branch that already has a worktree just
+switches to it.
 
 Sessions are keyed by directory and never restored automatically — startup
 stays predictable, and `<leader>sl` restores one when you want it. Project
@@ -183,7 +219,8 @@ Splits `-` / `_`, pane movement `prefix + h/j/k/l`, and `Ctrl+h/j/k/l` without a
 prefix to move seamlessly between nvim splits and tmux panes.
 
 Floating popups: `prefix + t` scratch shell, `prefix + g` lazygit, `prefix + e`
-edit this config. In copy-mode, `Ctrl+p` / `Ctrl+n` jump 8 lines.
+edit this config, `prefix + n` today's note. In copy-mode, `Ctrl+p` / `Ctrl+n`
+jump 8 lines.
 
 A session per project, so switching away and back costs nothing — nvim keeps
 its tabs and LSP clients, and whatever is running in the other pane keeps its
@@ -191,4 +228,13 @@ state. `prefix + f` fzf-picks a project and switches to its session, creating
 it on first use with nvim and claude side by side (`tmux/tmux-sessionizer`,
 roots configurable via `TMUX_SESSIONIZER_PATHS`). `prefix + s` lists sessions,
 `prefix + Ctrl+f` fzf-picks one of the open sessions, and `prefix + Shift-Tab`
-bounces back to the last one.
+bounces back to the last one. `prefix + W` opens another branch as a worktree
+session (see Projects & worktrees).
+
+Sessions survive a reboot. [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect)
+and [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum) save every
+session, window, split and directory every 10 minutes and restore them when
+tmux starts again: nvim reopens in its pane and claude comes back with
+`--continue`, into the conversation it was in. `prefix + Ctrl+s` /
+`prefix + Ctrl+r` save and restore by hand. `install.sh` clones both plugins;
+there is no plugin manager.

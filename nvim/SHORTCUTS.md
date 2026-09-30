@@ -110,6 +110,58 @@ f-strings and multi-line strings alike. Use them after any operator: `vaq`,
 | `aq`     | Visual/Operator-pending | Select the whole string, quotes included    |
 | `iq`     | Visual/Operator-pending | Select the string contents, without quotes  |
 
+## Jumping (flash.nvim)
+
+| Shortcut | Mode                   | Description                                             |
+| -------- | ---------------------- | ------------------------------------------------------- |
+| `s`      | Normal/Visual/Operator | Jump: type a few letters of the target, then its label  |
+| `S`      | Normal/Visual/Operator | Select the treesitter node around the cursor            |
+| `r`      | Operator-pending       | Act on a remote spot and come back (`yr<label>iw`)      |
+| `[x`     | Normal                 | Jump up to the pinned context line (treesitter-context) |
+
+`f` / `t` stay plain vim.
+
+## Surround (mini.surround)
+
+| Shortcut          | Mode          | Description                                   |
+| ----------------- | ------------- | --------------------------------------------- |
+| `gsa{motion}{c}`  | Normal/Visual | Add: `gsaiw"` turns `word` into `"word"`      |
+| `gsd{c}`          | Normal        | Delete: `gsd"` turns `"word"` into `word`     |
+| `gsr{old}{new}`   | Normal        | Replace: `gsr"'` turns `"word"` into `'word'` |
+| `gsf` / `gsF`     | Normal        | Find the next / previous surrounding          |
+| `gsh`             | Normal        | Highlight the surrounding                     |
+
+`(` adds inner spaces, `)` doesn't. `f` is a function call, `t` an HTML tag.
+
+## Find & Replace, Undo
+
+| Shortcut     | Mode   | Description                                              |
+| ------------ | ------ | -------------------------------------------------------- |
+| `<leader>fr` | Normal | Find and replace in the project (word under the cursor)  |
+| `<leader>fr` | Visual | Find and replace the selection in the project            |
+| `<Space>r`   | grug-far buffer | Apply the replacement                           |
+| `<leader>U`  | Normal | Toggle the undo tree (`j`/`k` preview, `<CR>` restore)   |
+
+## Claude
+
+| Shortcut     | Mode   | Description                                               |
+| ------------ | ------ | --------------------------------------------------------- |
+| `<leader>ac` | Normal | Paste `@path/to/file` into the claude tmux pane           |
+| `<leader>ac` | Visual | Paste the path, line range and selected code into claude  |
+
+Nothing is submitted; focus moves to the claude pane.
+
+## Git Review (diffview.nvim)
+
+| Shortcut     | Mode   | Description                                       |
+| ------------ | ------ | ------------------------------------------------- |
+| `<leader>gd` | Normal | Review all uncommitted changes (toggle)           |
+| `<leader>gh` | Normal | History of the current file (toggle)              |
+| `<leader>gH` | Normal | History of the branch (toggle)                    |
+| `q`          | Diffview | Close the view                                  |
+| `-`          | Diffview file panel | Stage / unstage the file             |
+| `<Tab>` / `<S-Tab>` | Diffview | Next / previous file                   |
+
 ## File Manager (lf)
 
 | Shortcut     | Mode   | Description                                        |
