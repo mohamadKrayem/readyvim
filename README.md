@@ -216,7 +216,7 @@ so `nvim .` lands in lf.
 | `yp` / `yd` | absolute path / containing directory |
 | `yr` | path relative to the repo root |
 
-`af` / `ad` create a file / directory, `D` deletes (with confirmation), `o`
+`af` / `ad` create a file / directory, `D` deletes for good after listing what will go and asking `y/N`, `o`
 opens with the system default app. Multi-file selections work throughout.
 Clipboard support is macOS-only (`pbcopy`).
 

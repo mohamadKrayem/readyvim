@@ -65,7 +65,30 @@ cmd mkdir %{{
 
 map af push :mkfile<space>
 map ad push :mkdir<space>
-map D delete
+# Deletes for good - nothing goes to the Trash - so before anything is
+# removed it lists exactly what will go and waits for an explicit y.
+# Anything else (Enter, n, Esc) cancels.
+cmd delete-confirm ${{
+	printf '\n  Delete permanently - this cannot be undone:\n\n'
+	printf '%s\n' "$fx" | while IFS= read -r p; do
+		[ -n "$p" ] || continue
+		if [ -d "$p" ]; then printf '    %s/  (folder, with everything in it)\n' "${p#"$PWD"/}"
+		else printf '    %s\n' "${p#"$PWD"/}"
+		fi
+	done
+	count=$(printf '%s\n' "$fx" | grep -c .)
+	printf '\n  Delete %s item(s)? [y/N] ' "$count"
+	read -r answer
+	if [ "$answer" = y ] || [ "$answer" = Y ]; then
+		printf '%s\n' "$fx" | while IFS= read -r p; do
+			[ -n "$p" ] && rm -rf -- "$p"
+		done
+		lf -remote "send $id :unselect; reload; echo deleted $count item(s)"
+	else
+		lf -remote "send $id echo cancelled - nothing deleted"
+	fi
+}}
+map D delete-confirm
 
 # Hand the file to the macOS default app (Preview, browser, ...) rather than
 # opening it back in nvim, which is what <enter> / l already do.
