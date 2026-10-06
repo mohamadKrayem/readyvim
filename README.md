@@ -4,8 +4,8 @@
 
 **[mohamadkrayem.github.io/readyvim-site](https://mohamadkrayem.github.io/readyvim-site/)** — install steps, keymaps and the rest, on one page.
 
-Configuration for the tools I actually live in: Neovim, tmux, lf and lazygit.
-They're wired together — the same `Ctrl+h/j/k/l` crosses nvim splits and tmux panes,
+Configuration for the tools I live in: Neovim, tmux, lf and lazygit.
+They're wired together: the same `Ctrl+h/j/k/l` crosses nvim splits and tmux panes,
 lazygit opens files back into the nvim instance that launched it, and lf runs as
 the file manager inside nvim (`<leader>-`), replacing netrw.
 
@@ -29,21 +29,21 @@ cd ~/personal/dotfiles
 `install.sh` moves anything already at those paths into a timestamped
 `~/.dotfiles-backup-*` directory before linking, and is safe to re-run.
 
-To try the Neovim config without touching an existing one — no symlinks, no
-`install.sh`, nothing written outside the clone:
+To try the Neovim config without touching an existing one (no symlinks, no
+`install.sh`, nothing written outside the clone):
 
 ```bash
 git clone git@github.com:mohamadKrayem/readyvim.git ~/personal/dotfiles
 XDG_CONFIG_HOME=~/personal/dotfiles nvim
 ```
 
-(`NVIM_APPNAME` won't work here — it resolves under `~/.config`, so it can't
+(`NVIM_APPNAME` won't work here: it resolves under `~/.config`, so it can't
 reach a clone living anywhere else.)
 
 ## Try it in Docker
 
-Test the whole setup in a throwaway container — no symlinks, nothing installed
-on your machine:
+Test the whole setup in a throwaway container, with no symlinks and nothing
+installed on your machine:
 
 ```bash
 make docker-test
@@ -68,7 +68,7 @@ the Neovim plugins, and drops you into a themed tmux session. See
 | lazygit, yazi | optional, but the integrations expect them |
 | ipykernel | optional, for the Python REPL (see below) |
 
-A **Nerd Font** is required for Neovim — the statusline, bufferline and diagnostic
+A **Nerd Font** is required for Neovim: the statusline, bufferline and diagnostic
 signs all use glyphs. The tmux config is deliberately ASCII-only and needs no
 special font.
 
@@ -89,8 +89,8 @@ lua/plugins/
   ui/ editor/ lsp/ git/ ai/ debug/
 ```
 
-Adding a plugin means dropping a file into the matching folder — `lua/config/lazy.lua`
-imports folders, not individual files.
+Adding a plugin means dropping a file into the matching folder.
+`lua/config/lazy.lua` imports folders, not individual files.
 
 See [nvim/SHORTCUTS.md](nvim/SHORTCUTS.md) for the full keymap reference.
 
@@ -112,12 +112,12 @@ surround lives under `gs`.
 
 With claude in the next tmux pane (the sessionizer's layout), `<leader>ac`
 pastes `@path/to/file` into it; on a visual selection it pastes the path, the
-line range and the code. Nothing is submitted — focus moves to claude so you
+line range and the code. Nothing is submitted: focus moves to claude so you
 type the question and press Enter yourself.
 
 `prefix + ;` collapses the claude pane: the editor fills the window while
 claude keeps running out of sight, and the window's tab shows `[zoomed]`.
-Press it again — or move into it with `Ctrl+l` — and the old layout comes back
+Press it again, or move into it with `Ctrl+l`, and the old layout comes back
 exactly, same split and width.
 
 ## Git review
@@ -145,13 +145,13 @@ closes and nvim moves to the selected worktree. lazygit's own `space` still
 switches only lazygit.
 
 To work on two branches side by side instead, `prefix + W` in tmux picks a
-branch of the repo in the current pane — or takes a new name — creates the
+branch of the repo in the current pane (or takes a new name), creates the
 worktree next to the repo as `<repo>-<branch>`, and opens it as its own tmux
 session with nvim and claude. Picking a branch that already has a worktree just
 switches to it.
 
-Sessions are keyed by directory and never restored automatically — startup
-stays predictable, and `<leader>sl` restores one when you want it. Project
+Sessions are keyed by directory and never restored automatically, so startup
+stays predictable; `<leader>sl` restores one when you want it. Project
 roots come from `TMUX_SESSIONIZER_PATHS`, the same variable the tmux
 sessionizer reads, so both pickers agree on what counts as a project.
 
@@ -225,12 +225,11 @@ Clipboard support is macOS-only (`pbcopy`).
 Standalone, no framework. The prefix is `Ctrl+Space`, and it's the only one.
 Press it twice to send a real `Ctrl+Space` to the program in the pane.
 Splits `-` / `_`, pane movement `prefix + h/j/k/l`, and `Ctrl+h/j/k/l` without a
-prefix to move seamlessly between nvim splits and tmux panes.
+prefix moves between nvim splits and tmux panes with the same keys.
 
 Floating popups: `prefix + t` scratch shell, `prefix + g` lazygit, `prefix + e`
-edit this config, `prefix + n` today's note. `prefix + ;` collapses / expands
-the claude pane (see Claude). In copy-mode, `Ctrl+p` / `Ctrl+n`
-jump 8 lines.
+edit this config, `prefix + n` today's note. In copy-mode, `Ctrl+p` / `Ctrl+n`
+jump 8 lines. `prefix + ;` collapses / expands the claude pane (see Claude).
 
 A session per project, so switching away and back costs nothing — nvim keeps
 its tabs and LSP clients, and whatever is running in the other pane keeps its
