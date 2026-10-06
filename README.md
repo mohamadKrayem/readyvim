@@ -140,6 +140,10 @@ a server or a log tail stays where it is.
 each one by branch and marking the one you are currently in. Switching
 worktrees is switching directory, so each keeps its own session.
 
+From lazygit (`<leader>lg`), `S` in the Worktrees panel does the same: lazygit
+closes and nvim moves to the selected worktree. lazygit's own `space` still
+switches only lazygit.
+
 To work on two branches side by side instead, `prefix + W` in tmux picks a
 branch of the repo in the current pane — or takes a new name — creates the
 worktree next to the repo as `<repo>-<branch>`, and opens it as its own tmux

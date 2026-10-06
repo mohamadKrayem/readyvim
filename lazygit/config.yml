@@ -7,3 +7,17 @@ os:
   # float and opens the file in the real editing window (see nvim/lua/plugins/git/lazygit.lua).
   edit: 'nvim --server "$NVIM" --remote-expr "v:lua.LazygitEdit(''{{filename}}'', 0)" >/dev/null 2>&1'
   editAtLine: 'nvim --server "$NVIM" --remote-expr "v:lua.LazygitEdit(''{{filename}}'', {{line}})" >/dev/null 2>&1'
+
+customCommands:
+  # In the Worktrees panel, S closes lazygit and moves the parent nvim to the
+  # selected worktree (LazygitSwitchWorktree in nvim/lua/plugins/git/lazygit.lua),
+  # saving and restoring sessions like <leader>gw. lazygit's own space still
+  # switches only lazygit. Needs lazygit opened from nvim (<leader>lg): in the
+  # tmux popup there is no nvim to move, so S does nothing there.
+  - key: "S"
+    context: "worktrees"
+    description: "Switch nvim to this worktree"
+    command: >-
+      [ -z "$NVIM" ] ||
+      nvim --server "$NVIM" --remote-expr "v:lua.LazygitSwitchWorktree('{{.SelectedWorktree.Path}}')" >/dev/null 2>&1
+    showOutput: false

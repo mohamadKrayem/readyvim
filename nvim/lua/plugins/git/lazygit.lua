@@ -8,6 +8,32 @@ return {
 	-- we pick the real editing window ourselves, close the lazygit float, and
 	-- open the file there (jumping to it if it's already visible via :drop).
 	init = function()
+		-- Close the lazygit floating terminal(s).
+		local function close_lazygit()
+			for _, w in ipairs(vim.api.nvim_list_wins()) do
+				local ok, cfg = pcall(vim.api.nvim_win_get_config, w)
+				if ok and cfg.relative ~= "" then
+					local b = vim.api.nvim_win_get_buf(w)
+					if vim.bo[b].buftype == "terminal" then
+						pcall(vim.api.nvim_win_close, w, true)
+						pcall(vim.api.nvim_buf_delete, b, { force = true })
+					end
+				end
+			end
+			vim.g.lazygit_opened = 0
+		end
+
+		-- Called by the `S` custom command in lazygit's Worktrees panel (see
+		-- lazygit config.yml): close lazygit and move this nvim to that
+		-- worktree, saving and restoring sessions the way <leader>gw does.
+		function _G.LazygitSwitchWorktree(path)
+			vim.schedule(function()
+				close_lazygit()
+				vim.cmd("ProjectSwitch " .. vim.fn.fnameescape(path))
+			end)
+			return ""
+		end
+
 		function _G.LazygitEdit(file, line)
 			vim.schedule(function()
 				-- Find the real editing window (non-floating, non-terminal).
@@ -20,18 +46,7 @@ return {
 						break
 					end
 				end
-				-- Close the lazygit floating terminal(s).
-				for _, w in ipairs(vim.api.nvim_list_wins()) do
-					local ok, cfg = pcall(vim.api.nvim_win_get_config, w)
-					if ok and cfg.relative ~= "" then
-						local b = vim.api.nvim_win_get_buf(w)
-						if vim.bo[b].buftype == "terminal" then
-							pcall(vim.api.nvim_win_close, w, true)
-							pcall(vim.api.nvim_buf_delete, b, { force = true })
-						end
-					end
-				end
-				vim.g.lazygit_opened = 0
+				close_lazygit()
 				if target and vim.api.nvim_win_is_valid(target) then
 					vim.api.nvim_set_current_win(target)
 				end

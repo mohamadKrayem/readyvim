@@ -184,6 +184,7 @@ automatically; you ask for one.
 | `<leader>sP` | Normal | Bounce back to the previous project                |
 | `<leader>sl` | Normal | Restore the session for the current directory      |
 | `<leader>gw` | Normal | Switch to another worktree of this repo            |
+| `S`          | lazygit Worktrees panel | Move nvim to the selected worktree |
 
 Worktrees go through the same path as projects: the current directory's session
 is saved and the target's restored, so each worktree keeps its own tabs and
