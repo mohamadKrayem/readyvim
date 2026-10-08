@@ -90,6 +90,14 @@ cmd delete-confirm ${{
 }}
 map D delete-confirm
 
+# The preview pane only reads what fits on screen and can't scroll, so i
+# reads the whole file in nvim, with all the usual keys: Ctrl+p / Ctrl+n 8
+# lines, / to search, v / V to select, y to copy to the clipboard, s to jump.
+# q goes straight back to lf. Read-only twice over: -R refuses :w and
+# nomodifiable refuses edits. Not -M - that locks the buffer before the
+# config loads, and options.lua then fails halfway through.
+map i $nvim -R -c 'setlocal nomodifiable' -c 'nnoremap q <cmd>qa!<CR>' -- "$f"
+
 # Hand the file to the macOS default app (Preview, browser, ...) rather than
 # opening it back in nvim, which is what <enter> / l already do.
 map o &open "$f"

@@ -218,6 +218,10 @@ so `nvim .` lands in lf.
 
 `af` / `ad` create a file / directory, `D` deletes for good after listing what will go and asking `y/N`, `o`
 opens with the system default app. Multi-file selections work throughout.
+
+The preview pane only shows what fits and can't scroll, so `i` opens the file
+read-only in nvim with all the usual keys: `Ctrl+p` / `Ctrl+n` for 8 lines, `/`
+to search, `v` / `V` to select, `y` to copy. `q` goes back to lf.
 Clipboard support is macOS-only (`pbcopy`).
 
 ## tmux
