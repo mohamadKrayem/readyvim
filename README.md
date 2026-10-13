@@ -240,8 +240,8 @@ its tabs and LSP clients, and whatever is running in the other pane keeps its
 state. `prefix + f` fzf-picks a project and switches to its session, creating
 it on first use with nvim and claude side by side (`tmux/tmux-sessionizer`,
 roots configurable via `TMUX_SESSIONIZER_PATHS`). `prefix + s` lists sessions,
-`prefix + Ctrl+f` fzf-picks one of the open sessions, and `prefix + Shift-Tab`
-bounces back to the last one. `prefix + W` opens another branch as a worktree
+`prefix + Ctrl+f` fzf-picks one of the open sessions, and `prefix + Tab`
+bounces back to the last one (`prefix + Shift-Tab` does the same for windows). `prefix + W` opens another branch as a worktree
 session (see Projects & worktrees).
 
 Sessions survive a reboot. [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect)

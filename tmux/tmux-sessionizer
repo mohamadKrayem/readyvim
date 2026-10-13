@@ -4,7 +4,7 @@
 #
 # A session per project is what makes switching cheap - nothing is torn down,
 # so nvim keeps its tabs and LSP clients and claude keeps its conversation.
-# Coming back is `prefix + s`, or `prefix + Shift-Tab` for the last one.
+# Coming back is `prefix + s`, or `prefix + Tab` for the last one.
 #
 # Takes a directory as an argument to skip the picker.
 set -euo pipefail
