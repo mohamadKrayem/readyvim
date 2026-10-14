@@ -209,6 +209,8 @@ Also available as `:Projects`, `:ProjectSwitch <path>` and `:Worktrees`. Project
 | `<leader>ih`  | Normal | Hide the output                                    |
 | `<leader>id`  | Normal | Delete the cell's output                           |
 | `<leader>ii`  | Normal | Start a kernel                                     |
+| `<leader>is`  | Normal | Set up the notebook environment + project kernel   |
+| `<leader>in`  | Normal | New notebook in the current folder                 |
 
 Opening a `.ipynb` starts its kernel and shows stored outputs; `:w` saves new
 ones. Removable: see "Notebooks" in the README.

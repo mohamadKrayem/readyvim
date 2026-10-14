@@ -175,19 +175,18 @@ and running cells).
 | `<leader>io` / `<leader>ih` | open (and enter) / hide the output window |
 | `<leader>id` | delete the cell's output |
 | `<leader>ii` | start a kernel, e.g. in a plain `.py` file |
+| `<leader>is` | set up everything a notebook needs to run (see below) |
+| `<leader>in` | new notebook in the current folder, opened and ready |
 
 Plots open in Preview rather than inline: Warp can't draw images inside tmux.
 
-It needs a Python environment of its own, once:
-
-```bash
-uv venv ~/.local/share/nvim-notebook
-uv pip install --python ~/.local/share/nvim-notebook/bin/python \
-  pynvim jupyter_client nbformat jupytext pillow
-```
-
-plus a kernel, which the Python REPL section below already sets up. Then run
-`:UpdateRemotePlugins` once in nvim and restart it.
+`<leader>is` sets everything up in one go, and is safe to run again: the
+notebook environment (`~/.local/share/nvim-notebook`, molten's Python side and
+jupytext), a kernel, and molten's registration with nvim. Run it inside a
+project that has its own `.venv` and that venv becomes a kernel named after the
+project, so notebooks can import the project's packages; elsewhere notebooks
+use a global `python3` kernel. `<leader>in` then creates a notebook bound to
+that kernel. After the very first setup, restart nvim once.
 
 **Don't want notebooks?** Everything lives in `nvim/lua/plugins/notebook/`, and
 `nvim/lua/config/lazy.lua` imports it on one line. Delete that line, then the
