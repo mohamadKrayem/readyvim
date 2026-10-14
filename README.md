@@ -182,11 +182,13 @@ Plots open in Preview rather than inline: Warp can't draw images inside tmux.
 
 `<leader>is` sets everything up in one go, and is safe to run again: the
 notebook environment (`~/.local/share/nvim-notebook`, molten's Python side and
-jupytext), a kernel, and molten's registration with nvim. Run it inside a
-project that has its own `.venv` and that venv becomes a kernel named after the
-project, so notebooks can import the project's packages; elsewhere notebooks
-use a global `python3` kernel. `<leader>in` then creates a notebook bound to
-that kernel. After the very first setup, restart nvim once.
+jupytext), a kernel, and molten's registration with nvim. Run it anywhere
+inside a project that has its own `.venv` (it looks upward for one) and that
+venv becomes a kernel named after the project. Notebooks anywhere in the
+project then start it, so they can import the project's packages, and a
+`pyrightconfig.json` is added so the LSP resolves them too (skipped if the
+project already configures pyright). Elsewhere notebooks use a global
+`python3` kernel. `<leader>in` then creates a notebook bound to that kernel. After the very first setup, restart nvim once.
 
 **Don't want notebooks?** Everything lives in `nvim/lua/plugins/notebook/`, and
 `nvim/lua/config/lazy.lua` imports it on one line. Delete that line, then the
