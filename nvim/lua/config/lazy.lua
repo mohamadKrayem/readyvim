@@ -29,5 +29,8 @@ require("lazy").setup({
 		{ import = "plugins.git" }, -- git signs, lazygit
 		{ import = "plugins.ai" }, -- AI completion
 		{ import = "plugins.debug" }, -- DAP
+		-- Optional: Jupyter notebooks (molten, jupytext, quarto). To drop them,
+		-- delete this line, then the lua/plugins/notebook folder.
+		{ import = "plugins.notebook" },
 	},
 })

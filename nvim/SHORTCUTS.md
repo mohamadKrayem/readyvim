@@ -195,6 +195,24 @@ Also available as `:Projects`, `:ProjectSwitch <path>` and `:Worktrees`. Project
 `~/Dev`, `~/personal` and `~/.config`, overridable with `TMUX_SESSIONIZER_PATHS`
 — the same variable the tmux sessionizer reads.
 
+## Notebooks (molten, optional)
+
+| Shortcut      | Mode   | Description                                        |
+| ------------- | ------ | -------------------------------------------------- |
+| `<leader>ir`  | Normal | Run the cell under the cursor (in a notebook)      |
+| `<leader>ir`  | Visual | Run the selection                                  |
+| `<leader>ia`  | Normal | Run this cell and every one above                  |
+| `<leader>iA`  | Normal | Run all cells                                      |
+| `<leader>il`  | Normal | Run the current line                               |
+| `<leader>ie`  | Normal | Run an operator (`<leader>ieip` runs a paragraph)  |
+| `<leader>io`  | Normal | Open / enter the output window                     |
+| `<leader>ih`  | Normal | Hide the output                                    |
+| `<leader>id`  | Normal | Delete the cell's output                           |
+| `<leader>ii`  | Normal | Start a kernel                                     |
+
+Opening a `.ipynb` starts its kernel and shows stored outputs; `:w` saves new
+ones. Removable: see "Notebooks" in the README.
+
 ## Python REPL (jet.nvim)
 
 | Shortcut     | Mode   | Description                                          |

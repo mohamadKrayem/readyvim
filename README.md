@@ -67,6 +67,7 @@ the Neovim plugins, and drops you into a themed tmux session. See
 | lf | file manager, opened from nvim and as netrw's replacement |
 | lazygit, yazi | optional, but the integrations expect them |
 | ipykernel | optional, for the Python REPL (see below) |
+| a Python venv | optional, for Jupyter notebooks (see Notebooks) |
 
 A **Nerd Font** is required for Neovim: the statusline, bufferline and diagnostic
 signs all use glyphs. The tmux config is deliberately ASCII-only and needs no
@@ -86,7 +87,7 @@ lua/config/
   diagnostics.lua     diagnostic appearance
   autocmds.lua        autocommands
 lua/plugins/
-  ui/ editor/ lsp/ git/ ai/ debug/
+  ui/ editor/ lsp/ git/ ai/ debug/ notebook/ (optional)
 ```
 
 Adding a plugin means dropping a file into the matching folder.
@@ -154,6 +155,44 @@ Sessions are keyed by directory and never restored automatically, so startup
 stays predictable; `<leader>sl` restores one when you want it. Project
 roots come from `TMUX_SESSIONIZER_PATHS`, the same variable the tmux
 sessionizer reads, so both pickers agree on what counts as a project.
+
+## Notebooks (optional)
+
+Jupyter notebooks open and save as `.ipynb`, but you edit them as Markdown: text
+with ```` ```python ```` code cells, full LSP inside the cells, and each cell's
+output shown under it. Opening a notebook starts the kernel it was saved with
+and shows the outputs already stored in it; `:w` writes new outputs back.
+Built from [molten-nvim](https://github.com/benlubas/molten-nvim) (runs code),
+[jupytext.nvim](https://github.com/GCBallesteros/jupytext.nvim) (the `.ipynb`
+conversion) and [quarto-nvim](https://github.com/quarto-dev/quarto-nvim) (LSP
+and running cells).
+
+| key | does |
+|---|---|
+| `<leader>ir` | run the cell under the cursor; on a visual selection, run the selection |
+| `<leader>ia` / `<leader>iA` | run this cell and every one above / run all cells |
+| `<leader>il` | run the current line |
+| `<leader>io` / `<leader>ih` | open (and enter) / hide the output window |
+| `<leader>id` | delete the cell's output |
+| `<leader>ii` | start a kernel, e.g. in a plain `.py` file |
+
+Plots open in Preview rather than inline: Warp can't draw images inside tmux.
+
+It needs a Python environment of its own, once:
+
+```bash
+uv venv ~/.local/share/nvim-notebook
+uv pip install --python ~/.local/share/nvim-notebook/bin/python \
+  pynvim jupyter_client nbformat jupytext pillow
+```
+
+plus a kernel, which the Python REPL section below already sets up. Then run
+`:UpdateRemotePlugins` once in nvim and restart it.
+
+**Don't want notebooks?** Everything lives in `nvim/lua/plugins/notebook/`, and
+`nvim/lua/config/lazy.lua` imports it on one line. Delete that line, then the
+folder, then run `:Lazy clean` and `rm -rf ~/.local/share/nvim-notebook`.
+Nothing else in the config refers to it.
 
 ## Python REPL
 
