@@ -1,8 +1,9 @@
 -- Run code in a Jupyter kernel and see the output right under it.
 --
 -- In a notebook (.ipynb, opened as Markdown by jupytext.lua) the kernel starts
--- by itself, picking the one the notebook was saved with, and the outputs
--- already stored in the file are shown. Saving writes new outputs back.
+-- by itself - the project's own kernel when its .venv has one, otherwise the
+-- one the notebook was saved with - and the outputs already stored in the file
+-- are shown. Saving writes new outputs back.
 -- In a plain .py file, <leader>ii starts a kernel first.
 --
 -- * <leader>ir  run the code cell under the cursor   (notebooks, via quarto)
@@ -31,14 +32,20 @@ return {
 		vim.g.molten_wrap_output = true
 		vim.g.molten_output_win_max_height = 20
 
-		-- Open a notebook: start the kernel it was saved with (falling back to
-		-- one named after the active venv), then show its stored outputs.
+		-- Open a notebook: start the kernel of the project it sits in (the
+		-- nearest .venv above it, registered by <leader>is), else the kernel it
+		-- was saved with, else one named after the active venv. Then show its
+		-- stored outputs.
 		local function init_notebook(e)
 			vim.schedule(function()
 				local kernels = vim.fn.MoltenAvailableKernels()
-				local ok, name = pcall(function()
-					return vim.json.decode(io.open(e.file, "r"):read("a")).metadata.kernelspec.name
-				end)
+				local proj = _G.NotebookProjectKernel and _G.NotebookProjectKernel(vim.fs.dirname(vim.fs.abspath(e.file)))
+				local ok, name = true, proj and proj.name
+				if not (name and vim.tbl_contains(kernels, name)) then
+					ok, name = pcall(function()
+						return vim.json.decode(io.open(e.file, "r"):read("a")).metadata.kernelspec.name
+					end)
+				end
 				if not ok or not vim.tbl_contains(kernels, name) then
 					name = nil
 					local active = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX")

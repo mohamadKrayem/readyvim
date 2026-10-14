@@ -1,32 +1,58 @@
 -- Getting a notebook to run, in one key each.
 --
 -- * <leader>is  set up the environment: the notebook venv (molten's Python
---               side + jupytext), a kernel for this project, and molten's
+--               side + jupytext), a kernel for this project, a
+--               pyrightconfig.json so the LSP sees the project's .venv (only if
+--               the project has no pyright settings), and molten's
 --               registration with nvim. Safe to run again - it only adds what
 --               is missing or out of date. Runs in a split so you see it work.
 -- * <leader>in  new notebook in the current folder, bound to this project's
 --               kernel (python3 when the project has none), opened right away.
 --
--- A project with its own .venv gets its own kernel, named after the project,
--- so a notebook can import the project's packages. Without one, notebooks use
--- the global python3 kernel.
+-- A project with its own .venv gets its own kernel, named after the folder
+-- that holds the .venv, so a notebook can import the project's packages - and
+-- notebooks opened anywhere under that folder use it. Without one, notebooks
+-- use the global python3 kernel.
 local notebook_venv = vim.fn.expand("~/.local/share/nvim-notebook")
 local global_kernel_venv = vim.fn.expand("~/.local/share/jupyter-kernel-venv")
 
-local function project_root()
-	local cwd = vim.fn.getcwd()
-	local git = vim.fn.systemlist({ "git", "-C", cwd, "rev-parse", "--show-toplevel" })[1]
-	return (vim.v.shell_error == 0 and git and git ~= "") and git or cwd
-end
-
--- The project's own kernel: only when it has a .venv to run it in.
-local function project_kernel()
-	local root = project_root()
-	if vim.fn.executable(root .. "/.venv/bin/python") == 0 then
+-- The project's own kernel: the nearest .venv at or above `dir` (the current
+-- directory by default), so it is found from any subfolder of the project.
+-- nil when there is no .venv to run a kernel in.
+local function project_kernel(dir)
+	local root = vim.fs.root(dir or vim.fn.getcwd(), function(name, path)
+		return name == ".venv" and vim.fn.executable(path .. "/.venv/bin/python") == 1
+	end)
+	if not root then
 		return nil
 	end
 	local name = vim.fs.basename(root):lower():gsub("[^%w%-_.]", "-")
 	return { root = root, python = root .. "/.venv/bin/python", name = name }
+end
+
+-- molten.lua asks the same question when a notebook opens, so it starts the
+-- project's kernel rather than whichever one the notebook was last saved with.
+_G.NotebookProjectKernel = project_kernel
+
+-- basedpyright doesn't find a project's .venv by itself, so imports from it
+-- show as unresolved. Tell it where the venv is - but only when the project
+-- has no pyright settings of its own, so nothing of yours is overridden.
+-- Returns true when it wrote the file.
+local function point_lsp_at_venv(root)
+	if vim.uv.fs_stat(root .. "/pyrightconfig.json") then
+		return false
+	end
+	local pyproject = root .. "/pyproject.toml"
+	if vim.uv.fs_stat(pyproject) then
+		local text = table.concat(vim.fn.readfile(pyproject), "\n")
+		if text:find("%[tool%.pyright%]") or text:find("%[tool%.basedpyright%]") then
+			return false
+		end
+	end
+	vim.fn.writefile({ '{ "venvPath": ".", "venv": ".venv" }' }, root .. "/pyrightconfig.json")
+	-- Language servers already running read their config at start.
+	vim.cmd("silent! LspRestart")
+	return true
 end
 
 local function setup()
@@ -79,15 +105,17 @@ local function setup()
 				-- at it now rather than waiting for a restart.
 				vim.g.python3_host_prog = notebook_venv .. "/bin/python"
 				if not vim.env.PATH:find(notebook_venv .. "/bin", 1, true) then
-					vim.env.PATH = notebook_venv .. "/bin:" .. vim.env.PATH
+					vim.env.PATH = vim.env.PATH .. ":" .. notebook_venv .. "/bin" -- last: see python-env.lua
 				end
 				vim.cmd("silent UpdateRemotePlugins")
 				if vim.api.nvim_buf_is_valid(buf) then
 					vim.api.nvim_buf_delete(buf, { force = true })
 				end
+				local wrote_config = proj and point_lsp_at_venv(proj.root)
 				vim.notify(
 					"Notebook environment ready"
 						.. (proj and (" - kernel '" .. proj.name .. "'") or " - kernel 'python3'")
+						.. (wrote_config and ", pyrightconfig.json added so the LSP sees .venv" or "")
 						.. ". If this was the first setup, restart nvim once.",
 					vim.log.levels.INFO
 				)
